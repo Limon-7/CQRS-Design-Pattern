@@ -1,12 +1,17 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../store/hooks';
 import './App.css';
 
 function App() {
+
+  const dispatch = useDispatch();
+  const [postId, setPostID] = useState("");
+  const{currentTab}=useAppSelector((state)=>state.toggle)
+  console.log(currentTab);
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
@@ -24,3 +29,4 @@ function App() {
 }
 
 export default App;
+ 
