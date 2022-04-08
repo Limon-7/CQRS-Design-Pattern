@@ -26,6 +26,7 @@ interface actionFail {
   payload: string ;
 }
 
+
 export type Action = actionPending | actionSuccess | actionFail;
 
 interface State {
