@@ -52,10 +52,9 @@ namespace APP.API.Controllers.V1
 		}
 
 		[HttpDelete("{id}")]
-		public async Task<Response<Activity>> Delete([FromRoute] Guid id, DeleteActivityCommand cmd)
+		public async Task<Response<Activity>> Delete([FromRoute] Guid id)
 		{
-			cmd.Id = id;
-			return await _mediator.Send(cmd);
+			return await _mediator.Send(new DeleteActivityCommand{Id=id});
 		}
 	}
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Container } from "semantic-ui-react";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
@@ -7,6 +7,7 @@ import api from "../api/api";
 import { IActivity } from "../model/iActivity";
 import { useAppSelector } from "../store/hooks";
 import "./App.css";
+import LoadingComponent from "./LoadingComponent";
 
 function App() {
   const dispatch = useDispatch();
@@ -19,27 +20,53 @@ function App() {
     null
   );
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [target, setTarget] = useState<string>("");
 
   const handleSelectedActivity = (id: string) => {
     setSelectedActivity(activities.filter((x) => x.id === id)[0]);
     setEditMode(false);
   };
-  const handleCreateActivity = (activity: IActivity) => {
-    setActivities([...activities, activity]);
-    setSelectedActivity(activity);
-    setEditMode(false);
+  const handleCreateActivity = async (activity: IActivity) => {
+    try {
+      setSubmitting(true);
+      let response = await api.Activities.create(activity);
+      setActivities([...activities, activity]);
+      setSelectedActivity(activity);
+      setEditMode(false);
+    } catch (error) {
+      console.log(error);
+    }
+    setSubmitting(false);
   };
-  const handleEditActivity = (activity: IActivity) => {
-    setActivities([
-      ...activities.filter((x) => x.id !== activity.id),
-      activity,
-    ]);
-    setSelectedActivity(activity);
-    setEditMode(false);
+  const handleEditActivity = async (activity: IActivity) => {
+    try {
+      setSubmitting(true);
+      await api.Activities.update(activity);
+      setActivities([
+        ...activities.filter((x) => x.id !== activity.id),
+        activity,
+      ]);
+      setSelectedActivity(activity);
+      setEditMode(false);
+    } catch (error) {
+      console.log(error);
+    }
+    setSubmitting(false);
   };
 
-  const handleDeleteActivity = (id: string) => {
-    setActivities([...activities.filter(x=>x.id!==id)]);
+  const handleDeleteActivity = async (
+    event: SyntheticEvent<HTMLButtonElement>,
+    id: string
+  ) => {
+    try {
+      setSubmitting(true);
+      setTarget(event.currentTarget.name);
+      await api.Activities.delete(id);
+      setActivities([...activities.filter((x) => x.id !== id)]);
+    } catch (error) {}
+    setSubmitting(false);
   };
 
   const handleOpenCreateForm = () => {
@@ -54,9 +81,11 @@ function App() {
         activities.push(activity);
       });
       setActivities(activities);
+      setLoading(false);
     });
   }, []);
 
+  if (loading) return <LoadingComponent />;
   return (
     <>
       <Navbar handleOpenCreateForm={handleOpenCreateForm} />
@@ -71,6 +100,8 @@ function App() {
           createActivity={handleCreateActivity}
           editActivity={handleEditActivity}
           deleteActivity={handleDeleteActivity}
+          submitting={submitting}
+          target={target}
         />
       </Container>
     </>

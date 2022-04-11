@@ -8,12 +8,14 @@ interface IProps {
   activity: IActivity | null;
   createActivity: (activity: IActivity) => void;
   editActivity: (activity: IActivity) => void;
+  submitting: boolean;
 }
 function ActivityForm({
   setEditMode,
   activity: initialFormState,
   createActivity,
   editActivity,
+  submitting
 }: IProps) {
   const initializeForm = () => {
     if (initialFormState) return initialFormState;
@@ -89,7 +91,7 @@ function ActivityForm({
           name="venue"
           value={venue}
         />
-        <Button floated="right">Submit</Button>
+        <Button loading={submitting} floated="right">Submit</Button>
         <Button floated="right" onClick={() => setEditMode(false)}>
           Cancel
         </Button>
