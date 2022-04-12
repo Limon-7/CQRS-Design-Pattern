@@ -5,15 +5,16 @@ import ActivityDashboard from "../../features/activities/dashboard/ActivityDashb
 import Navbar from "../../features/nav/Navbar";
 import api from "../api/api";
 import { IActivity } from "../model/iActivity";
+import { getActivities } from "../reducer/activityReducer";
 import { useAppSelector } from "../store/hooks";
 import "./App.css";
 import LoadingComponent from "./LoadingComponent";
 
 function App() {
   const dispatch = useDispatch();
-  const [postId, setPostID] = useState("");
-  const { currentTab } = useAppSelector((state) => state.toggle);
-  console.log(currentTab);
+  const activityState = useAppSelector((state) => state.activities);
+  console.log("activityState", activityState);
+
 
   const [activities, setActivities] = useState<IActivity[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<IActivity | null>(
@@ -74,6 +75,8 @@ function App() {
     setEditMode(true);
   };
   useEffect(() => {
+    dispatch(getActivities());
+
     api.Activities.list().then((res) => {
       let activities: IActivity[] = [];
       res.forEach((activity) => {
